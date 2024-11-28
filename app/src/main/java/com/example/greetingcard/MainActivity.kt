@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -16,9 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.greetingcard.ui.theme.BirthdayCardTheme
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    ComposableApp()
+                    CardContainer()
                 }
             }
         }
@@ -43,186 +44,116 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun GreetingImage(name: String, from: String = "System", modifier: Modifier) {
-    val image = painterResource(id = R.drawable.androidparty)
-    Box(modifier = modifier) {
-        Image(
-            painter = image,
-            contentDescription = "party background",
-            contentScale = ContentScale.Crop,
-            alpha = 0.5F
-        )
-        Greeting(
-            name = name,
-            from,
+private fun CardContainer() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(rgb(210, 232, 212)),
+        verticalArrangement = Arrangement.SpaceBetween, // Adjusts content to be spread out
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // User info in the center
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
+                .weight(1f) // Takes up available space, pushing the content to the center
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            UserInfo(fullName = "John Doe", title = "Senior Backend Developer")
+        }
+
+        // Spacer to fill space and push ContactInfo to the bottom
+        Spacer(modifier = Modifier.height(16.dp)) // Add space if needed
+
+        // Contact info at the bottom
+
+        ContactInfo(
+            phone = "+62 852-9622-3972",
+            email = "android@gmail.com",
+            userId = "@android_dev"
         )
+
     }
 }
 
 @Composable
-fun Greeting(name: String, from: String = "System", modifier: Modifier = Modifier) {
+private fun UserInfo(fullName: String, title: String, modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.Center,
         modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        AndroidIcon(backgroundColor = rgb(7, 48, 66))
         Text(
-            text = name,
-            fontSize = 100.sp,
+            text = fullName,
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center
         )
-        Text(
-            text = from,
-            fontSize = 36.sp,
-            modifier = Modifier
-                .padding(36.dp)
-                .align(
-                    alignment = Alignment.CenterHorizontally
-                )
-        )
-    }
-}
-
-
-@Composable
-fun ArticleCard(
-    title: String,
-    shortDesc: String,
-    longDesc: String,
-    headerImage: Painter,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        Image(painter = headerImage, contentDescription = "header image")
-        Text(text = title, fontSize = 24.sp, modifier = Modifier.padding(16.dp))
-        Text(
-            text = shortDesc,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-            textAlign = TextAlign.Justify
-        )
-        Text(text = longDesc, modifier = Modifier.padding(16.dp), textAlign = TextAlign.Justify)
+        Text(text = title, color = rgb(2, 110, 59), textAlign = TextAlign.Center)
     }
 }
 
 @Composable
-fun InfoCard(
-    title: String,
-    description: String,
-    backgroundColor: Color,
+private fun ContactInfo(
+    phone: String = "+62",
+    email: String = "example@gmail.com",
+    userId: String = "@Android",
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(16.dp),
+            .fillMaxWidth()
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = title,
-            modifier = Modifier.padding(bottom = 16.dp),
-            fontWeight = FontWeight.Bold
-
-        )
-        Text(text = description, textAlign = TextAlign.Justify)
-    }
-}
-
-@Composable
-fun ComposableApp() {
-    Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.weight(1f)) {
-            InfoCard(
-                title = stringResource(id = R.string.text_compose_title),
-                description = stringResource(id = R.string.text_compose_desc),
-                backgroundColor = Color(0xFFEADDFF),
-                modifier = Modifier.weight(1f)
-            )
-            InfoCard(
-                title = stringResource(id = R.string.image_compose_title),
-                description = stringResource(id = R.string.image_compose_desc),
-                backgroundColor = Color(0xFFD0BCFF),
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Row(Modifier.weight(1f)) {
-            InfoCard(
-                title = stringResource(id = R.string.row_compose_title),
-                description = stringResource(id = R.string.row_compose_desc),
-                backgroundColor = Color(0xFFB69DF8),
-                modifier = Modifier.weight(1f)
-            )
-            InfoCard(
-                title = stringResource(id = R.string.col_compose_title),
-                description = stringResource(id = R.string.col_compose_desc),
-                backgroundColor = Color(0xFFF6EDFF),
-                modifier = Modifier.weight(1f)
-            )
+        Column() {
+            ContactItem(iconImage = painterResource(id = R.drawable.call), value = phone)
+            ContactItem(iconImage = painterResource(id = R.drawable.share_icon), value = userId)
+            ContactItem(iconImage = painterResource(id = R.drawable.mail_icon), value = email)
         }
     }
 }
 
 @Composable
-fun ComposeQuadrantApp() {
-    Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.weight(1f)) {
-            ComposableInfoCard(
-                title = stringResource(R.string.text_compose_title),
-                description = stringResource(R.string.text_compose_desc),
-                backgroundColor = Color(0xFFEADDFF),
-                modifier = Modifier.weight(1f)
-            )
-            ComposableInfoCard(
-                title = stringResource(R.string.image_compose_title),
-                description = stringResource(R.string.image_compose_desc),
-                backgroundColor = Color(0xFFD0BCFF),
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Row(Modifier.weight(1f)) {
-            ComposableInfoCard(
-                title = stringResource(R.string.row_compose_title),
-                description = stringResource(R.string.row_compose_desc),
-                backgroundColor = Color(0xFFB69DF8),
-                modifier = Modifier.weight(1f)
-            )
-            ComposableInfoCard(
-                title = stringResource(R.string.col_compose_title),
-                description = stringResource(R.string.col_compose_desc),
-                backgroundColor = Color(0xFFF6EDFF),
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun ComposableInfoCard(
-    title: String,
-    description: String,
-    backgroundColor: Color,
+private fun AndroidIcon(
+    backgroundColor: Color = Color(red = 0f, green = 0f, blue = 0.251f),
+    size: Dp = 128.dp,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = title,
-            modifier = Modifier.padding(bottom = 16.dp),
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = description,
-            textAlign = TextAlign.Justify
+    Box(Modifier.size(size)) {
+        Image(
+            painter = painterResource(id = R.drawable.android_logo),
+            contentDescription = "android_icon",
+            modifier = modifier
+                .fillMaxSize()
+                .background(backgroundColor),
+            contentScale = ContentScale.Fit
         )
     }
+}
+
+
+@Composable
+private fun ContactItem(iconImage: Painter, value: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.padding(top = 5.dp, bottom = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = iconImage,
+            contentDescription = "contact_icon",
+            tint = rgb(2, 110, 59)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = value)
+    }
+}
+
+private fun rgb(red: Int = 0, green: Int = 0, blue: Int = 0, alpha: Float = 1.0f): Color {
+    return Color(red = red / 255f, green = green / 255f, blue = blue / 255f, alpha = alpha)
 }
