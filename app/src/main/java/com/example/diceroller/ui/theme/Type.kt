@@ -1,4 +1,4 @@
-package com.example.greetingcard.ui.theme
+package com.example.diceroller.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
