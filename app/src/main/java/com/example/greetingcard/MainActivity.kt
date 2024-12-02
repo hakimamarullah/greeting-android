@@ -3,6 +3,7 @@ package com.example.greetingcard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,7 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TipTimeApp() {
     var billInput by remember { mutableStateOf("0.0") }
-    val tip = calculateTip(billInput.toDoubleOrNull() ?: 0.0)
+    var tipPercent by remember { mutableStateOf("0") }
+    val tip = calculateTip(billInput.toDoubleOrNull() ?: 0.0, tipPercent.toIntOrNull())
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -54,7 +56,24 @@ fun TipTimeApp() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         UpperTitle()
-        BillInputField(value = billInput, onValueChange = { billInput = it })
+        NumberInputField(
+            value = billInput,
+            onValueChange = { billInput = it },
+            label = R.string.bill_amount_label,
+            imeAction = ImeAction.Next,
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .fillMaxWidth()
+        )
+        NumberInputField(
+            value = tipPercent,
+            onValueChange = { tipPercent = it },
+            label = R.string.how_was_the_service,
+            imeAction = ImeAction.Done,
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .fillMaxWidth()
+        )
         TotalTipText(tip = NumberFormat.getCurrencyInstance().format(tip))
         Spacer(modifier = Modifier.height(150.dp))
     }
@@ -64,8 +83,7 @@ fun TipTimeApp() {
 fun UpperTitle() {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 17.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -78,13 +96,19 @@ fun UpperTitle() {
 }
 
 @Composable
-fun BillInputField(value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
+fun NumberInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes label: Int = R.string.unknown_field,
+    imeAction: ImeAction = ImeAction.Default,
+    modifier: Modifier = Modifier
+) {
     TextField(
         value = value,
         onValueChange = onValueChange,
         singleLine = true,
-        label = { (Text(text = stringResource(id = R.string.bill_amount_label))) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        label = { (Text(text = stringResource(id = label))) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
         modifier = modifier
     )
 }
@@ -94,12 +118,12 @@ fun TotalTipText(tip: String) {
     Text(
         text = stringResource(id = R.string.tip_amount, tip),
         modifier = Modifier.padding(top = 16.dp),
-        fontWeight = FontWeight.Medium
     )
 }
 
-fun calculateTip(amount: Double): Double {
-    return 15 / 100.0 * amount;
+
+fun calculateTip(amount: Double, percentage: Int?): Double {
+    return (percentage ?: 0 )/ 100.0 * amount;
 }
 
 @Preview(showBackground = true, showSystemUi = true)
