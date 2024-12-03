@@ -8,18 +8,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.greetingcard.ui.theme.TipCalculatorTheme
 import java.text.NumberFormat
 
@@ -45,7 +44,8 @@ class MainActivity : ComponentActivity() {
 fun TipTimeApp() {
     var billInput by remember { mutableStateOf("0.0") }
     var tipPercent by remember { mutableStateOf("0") }
-    val tip = calculateTip(billInput.toDoubleOrNull() ?: 0.0, tipPercent.toIntOrNull())
+    var roundUp by remember { mutableStateOf(false) }
+    val tip = calculateTip(billInput.toDoubleOrNull() ?: 0.0, tipPercent.toIntOrNull(), roundUp)
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -74,6 +74,7 @@ fun TipTimeApp() {
                 .padding(bottom = 16.dp)
                 .fillMaxWidth()
         )
+        RoundUpToggle(checked = roundUp, onCheckedChange = { roundUp = it })
         TotalTipText(tip = NumberFormat.getCurrencyInstance().format(tip))
         Spacer(modifier = Modifier.height(150.dp))
     }
@@ -108,22 +109,54 @@ fun NumberInputField(
         onValueChange = onValueChange,
         singleLine = true,
         label = { (Text(text = stringResource(id = label))) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = imeAction
+        ),
         modifier = modifier
     )
+}
+
+
+@Composable
+fun RoundUpToggle(
+    checked: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = stringResource(id = R.string.round_up_tip))
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.End)
+        )
+    }
 }
 
 @Composable
 fun TotalTipText(tip: String) {
     Text(
         text = stringResource(id = R.string.tip_amount, tip),
+        fontSize = 30.sp,
+        fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(top = 16.dp),
     )
 }
 
 
-fun calculateTip(amount: Double, percentage: Int?): Double {
-    return (percentage ?: 0 )/ 100.0 * amount;
+fun calculateTip(amount: Double, percentage: Int?, roundUp: Boolean = false): Double {
+    var tip = (percentage ?: 0) / 100.0 * amount
+    if (roundUp) {
+        tip = kotlin.math.ceil(tip)
+    }
+    return tip
 }
 
 @Preview(showBackground = true, showSystemUi = true)
