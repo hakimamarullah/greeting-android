@@ -1,4 +1,4 @@
-package com.example.greetingcard
+package com.example.artspace
 
 import org.junit.Test
 
