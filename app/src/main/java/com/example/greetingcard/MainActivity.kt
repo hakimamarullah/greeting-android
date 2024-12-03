@@ -3,6 +3,7 @@ package com.example.greetingcard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +13,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -60,6 +63,7 @@ fun TipTimeApp() {
             value = billInput,
             onValueChange = { billInput = it },
             label = R.string.bill_amount_label,
+            leadingIcon = R.drawable.money_icon,
             imeAction = ImeAction.Next,
             modifier = Modifier
                 .padding(bottom = 16.dp)
@@ -69,6 +73,7 @@ fun TipTimeApp() {
             value = tipPercent,
             onValueChange = { tipPercent = it },
             label = R.string.how_was_the_service,
+            leadingIcon = R.drawable.percent_icon,
             imeAction = ImeAction.Done,
             modifier = Modifier
                 .padding(bottom = 16.dp)
@@ -101,12 +106,14 @@ fun NumberInputField(
     value: String,
     onValueChange: (String) -> Unit,
     @StringRes label: Int = R.string.unknown_field,
+    @DrawableRes leadingIcon: Int,
     imeAction: ImeAction = ImeAction.Default,
     modifier: Modifier = Modifier
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
+        leadingIcon = { Icon(painter = painterResource(id = leadingIcon), null, tint = Color.DarkGray, modifier = Modifier.size(20.dp)) },
         singleLine = true,
         label = { (Text(text = stringResource(id = label))) },
         keyboardOptions = KeyboardOptions(
